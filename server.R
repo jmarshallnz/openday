@@ -65,7 +65,7 @@ shinyServer(function(input, output, session) {
   output$data <- renderPlot( {
     sample <- get_sample()
     par(mfrow=c(2,1),mar=c(0,3,3,0), omi=c(0.5,0,0,0))
-    barplot(sample, names = "", col=colours$col, ylim=c(0,max(sample, 5, na.rm=TRUE)), main="Sample")
+    barplot(sample, names = "", col=colours$col, ylim=c(0,max(sample, 5, na.rm=TRUE)), main="Sample", border=NA)
     if (!is.null(v$samples)) {
       popn <- colSums(v$samples)
       barplot(popn, names = "", col=colours$col, ylim=c(0,max(popn, 5, na.rm=TRUE)), main="Population", border=NA)
