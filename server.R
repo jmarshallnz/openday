@@ -13,13 +13,6 @@ if (!create_database(colours$label)) {
   cat("Unable to create database\n", file=stderr());
 }
 
-# some sample data for the other plot
-probs <- c(0.3, 0.2, 0.15, 0.2, 0.1, 0.05)
-n <- 100
-
-size <- sample(12:20, replace=TRUE, n)
-dat <- t(rmultinom(n, size, probs))
-
 lci <- function(x, n) {
   qbeta(0.025, x+1, n - x + 1)
 }
