@@ -1,15 +1,10 @@
-library(RMySQL)
 
 # fetch from the database if possible
 read_samples <- function() {
   values <- NULL
 
   try({
-    conn <- dbConnect(RMySQL::MySQL(), user='mandm', password='mandm', host='localhost', dbname='mandm')
-
-    values <- dbGetQuery(conn, "SELECT * FROM samples")[,-1]
-
-    dbDisconnect(conn)
+    values = na.omit(read.csv("mandm.csv"))
   }, silent=TRUE)
 
   values
@@ -20,16 +15,13 @@ create_database <- function(colours) {
   success <- FALSE
 
   try({
-    conn <- dbConnect(RMySQL::MySQL(), user='mandm', password='mandm', host='localhost', dbname='mandm')
-
-    # create score table if not already there
-    fields <- paste(c("sample_id INT PRIMARY KEY AUTO_INCREMENT", sprintf("%s INT", colours)), collapse=",")
-
-    res <- dbSendQuery(conn, paste("CREATE TABLE IF NOT EXISTS samples (", fields, ");"))
-    dbClearResult(res)
-
-    dbDisconnect(conn)
-
+    # check if the file exists
+    if (!file.exists("mandm.csv")) {
+      # otherwise, create it
+      scores <- matrix(NA, 1, length(colours))
+      colnames(scores) <- colours
+      write.csv(scores, "mandm.csv", row.names=FALSE)
+    }
     success <- TRUE
   }, silent=TRUE)
 
@@ -41,16 +33,11 @@ write_sample <- function(colours, sample) {
   success <- FALSE
 
   try({
-    conn <- dbConnect(RMySQL::MySQL(), user='mandm', password='mandm', host='localhost', dbname='mandm')
+    scores <- read.csv("mandm.csv")
+    scores <- rbind(scores, sample)
 
-    cols <- paste(colours, collapse=",")
-    vals <- paste(sample, collapse=",")
-    sql  <- paste("INSERT INTO samples(",cols,") VALUES(",vals,");")
-
-    res <- dbSendQuery(conn, sql)
-    dbClearResult(res)
-
-    dbDisconnect(conn)
+    write.csv(scores, "mandm.csv", row.names=FALSE)
+    
     success <- TRUE
   }, silent=TRUE)
 
