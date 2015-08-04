@@ -29,7 +29,7 @@ uci <- function(x, n) {
 
 shinyServer(function(input, output, session) {
 
-  v <- reactiveValues(samples = read_samples())
+  v <- reactiveValues(samples = as.matrix(read_samples()))
 
   # reactive that converts input into something we can plot/use
   get_sample <- reactive({
