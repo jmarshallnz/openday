@@ -9,7 +9,7 @@ clamp <- function(x, xmin=0, xmax=20) {
   min(max(x, xmin), xmax)
 }
 
-if (!create_database(colours)) {
+if (!create_database(colours$label)) {
   cat("Unable to create database\n", file=stderr());
 }
 
@@ -51,7 +51,7 @@ shinyServer(function(input, output, session) {
     if (sum(sample) > 0) {
       # write the results to the database
       v$samples <- rbind(v$samples, sample)
-      if (!write_sample(colours, sample)) {
+      if (!write_sample(colours$label, sample)) {
         cat("Unable to write sample to database\n", file=stderr())
       }
     }
