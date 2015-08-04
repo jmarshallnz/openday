@@ -25,6 +25,7 @@ inputs <- c(inputs, lapply(seq_len(nrow(colours)), createInput, colours, width="
 inputs[[nrow(colours)+2]] <- actionButton("submit", label="Submit")
 
 shinyUI(fluidPage(
+  titlePanel("Sampling M&Ms"),
   fluidRow(
     column(width=3, plotOutput("data")),
     column(width=9, plotOutput("history"))
