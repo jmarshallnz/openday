@@ -95,7 +95,8 @@ shinyServer(function(input, output, session) {
       cum_hist <- sweep(cum_hist, 1, rowSums(cum_hist), FUN="/")
     }
 
-    hist_breaks <- seq(0,1,by=0.07)
+    hist_step <- 0.07
+    hist_breaks <- seq(0,hist_step*ceiling(1/hist_step),by=hist_step)
     # plots...
     for (i in seq_len(nrow(colours))) {
       plot(NULL, xlim=c(0,K+5), ylim=c(0,1), type="n", xaxt="n", xaxs="i", ann=FALSE, bty="n", las=2)
