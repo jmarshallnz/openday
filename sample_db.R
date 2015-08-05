@@ -1,13 +1,14 @@
 library(RMySQL)
 
 # fetch from the database if possible
-read_samples <- function() {
+read_samples <- function(colours) {
   values <- NULL
 
   try({
     conn <- dbConnect(RMySQL::MySQL(), user='mandm', password='mandm', host='localhost', dbname='mandm')
 
-    values <- dbGetQuery(conn, "SELECT * FROM samples")[,-1]
+    fields <- paste(colours, collapse=",")
+    values <- dbGetQuery(conn, paste("SELECT ",fields, " FROM samples"))
 
     dbDisconnect(conn)
   }, silent=TRUE)
