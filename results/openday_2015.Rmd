@@ -1,0 +1,124 @@
+---
+title: "Open Day Stats"
+author: "Jonathan Marshall"
+date: "5 August 2015"
+output: html_document
+---
+
+```{r, echo=FALSE, message=FALSE}
+library(dplyr)
+mm <- read.csv("results/samples_2015.csv") %>% select(-year)
+quiz  <- read.csv("../openday_quiz/results/scores_2015.csv")
+quest <- read.csv("../openday_quiz/results/students_2015.csv")
+colours <- read.csv("colours.csv", stringsAsFactors=FALSE)
+```
+
+Open day is over. Thanks for all that helped. We had `r nrow(mm)` students do the M&M sampling exercise, and recorded `r nrow(quiz)` students with the confidence quiz (though we weren't recording the data for the first hour or so!)
+
+There were a total of `r sum(mm)` M&Ms sampled by students, with the colour distribution below
+
+```{r, echo=FALSE}
+popn <- colSums(mm)
+barplot(popn, names = colours$label, col=colours$col, ylim=c(0,max(popn, 5, na.rm=TRUE)), main="Population")
+```
+
+Occasionally some students suggested they were getting short-changed on the number of M&Ms, which could well be the case as the plot below shows.
+
+```{r, echo=FALSE}
+hist(rowSums(mm), xlab="Number of M&Ms per sample", col="grey70", main="")
+```
+
+The distribution of the sample proportions are below. Blue is the popular colour this year with yellow least prevalent.
+
+```{r, echo=FALSE}
+n_hist <- rowSums(mm)
+p_hist <- sweep(mm, 1, n_hist, FUN="/")
+boxplot(p_hist, labels=colours$label, col=colours$col, ylab="Proportion", xlab="Colour")
+```
+
+For the quiz, the 'score' and 'uncertainty bonus' distributions are below, as well as a scatter plot. The scores tend to be mostly centered on zero, though there's more students in the right tail than left (suggesting students on average got more right than wrong), and the uncertainty average suggests that 3 is the most popular uncertainty being middle of the road (scale was 0 = completely uncertain, 5 = completely certain).
+
+```{r, echo=FALSE}
+par(mfrow=c(1,2))
+hist(quiz$score, xlab="Score", main="", col="grey70")
+hist(quiz$bonus, xlab="Uncertainty bonus", main="", col="pink")
+```
+
+There doesn't seem to be much of a relationship between the score and the uncertainty bonus as seen below.
+
+```{r,echo=FALSE}
+plot(score ~ bonus, data=quiz, xlab="Uncertainty bonus", ylab="Score", main="")
+```
+
+I took a look at a (non-random) sample of 20 of the students to see which questions were hardest etc.
+
+```{r, echo=FALSE}
+correct <- c("b","b","a","a","b")
+plot(NULL, xlim=c(3,3*5+3), ylim=c(0,5), xlab="", xaxt="n", ylab="Confidence")
+conf <- paste0("C",1:5)
+ans  <- paste0("Q",1:5)
+for (i in seq_along(ans)) {
+  col <- c("grey70", "grey70"); names(col) <- c("a","b")
+  col[correct[i]] <- "pink"
+  boxplot(quest[,conf[i]] ~ quest[,ans[i]], col=col, add=TRUE, at=3*i + 1:2, ylab="", yaxt="n")
+  mtext(ans[i], side=1, at=3*i+1.5, line=2.5)
+}
+
+# some fancier analysis
+library(reshape2)
+ans  <- melt(quest, id.vars="Student", measure.vars=paste0("Q",1:5),
+             variable.name="Question", value.name="Answer") %>% mutate(Question=as.numeric(substring(Question,2,2)))
+conf <- melt(quest, id.vars="Student", measure.vars=paste0("C",1:5),
+             variable.name="Question", value.name="Confidence") %>% mutate(Question=as.numeric(substring(Question,2,2)))
+correct <- data.frame(Question=1:5, RealAnswer=c("b","b","a","a","b"))
+quest <- ans %>% left_join(conf) %>% left_join(correct) %>% mutate(Correct = ifelse(Answer == RealAnswer, "Yes", "No")) %>% data.frame
+
+write.csv(quest, "../openday_quiz/results/quiz_2015.csv", row.names=FALSE)
+
+quiz <- read.csv("quiz_2015.csv")
+quiz$Student <- as.factor(quiz$Student)
+
+mod1 <- glm(Correct ~ as.factor(Question) + Confidence, data=quiz, family="binomial")
+mod2 <- glm(Correct ~ as.factor(Question) * Confidence, data=quiz, family="binomial")
+anova(mod1, mod2, test="Chisq")
+anova(mod2, test="Chisq")
+summary(mod2)
+
+library(lme4)
+# this model suggests not much between-student variation
+mod3 <- glmer(Correct ~ as.factor(Question) + Confidence + (1|Student), data=quiz, family="binomial")
+# and the model below doesn't converge...
+mod4 <- glmer(Correct ~ as.factor(Question) * Confidence + (1|Student), data=quiz, family="binomial")
+
+# plotting the residuals from the glm also suggests not much between-student variation, with only
+# one student's residuals not covering 0
+plot(resid(mod2) ~ quiz$Student)
+
+# do some plots of the chance of being right vs confidence and question
+new_data = expand.grid(Question=1:5, Confidence=0:5)
+#new_data$Question = as.factor(new_data$Question)
+fit = predict(mod2, new_data, se.fit=TRUE)
+new_data$p = 1/(1 + exp(-fit$fit))
+new_data$pl = 1/(1 + exp(-fit$fit + 2*fit$se.fit))
+new_data$pu = 1/(1 + exp(-fit$fit - 2*fit$se.fit))
+
+png("quiz.png", width=700, height=300)
+plot(NULL, xlim=c(0,5*6), ylim=c(-0.05,1.05), xlab="Confidence", ylab="P(Correct)", xaxt="n")
+axis(1, at=0:(5*6-1), labels=rep(0:5, 5))
+# ideally we'd also plot the data...
+points(quiz$Confidence + (quiz$Question-1)*6, ifelse(quiz$Correct == "Yes", 1.05, -0.05), pch=19, col="#0000002F")
+for (i in 1:5) {
+#  plot(NULL, xlim=c(0,5), ylim=c(0,1), xlab="Confidence", ylab="P(Correct)", main=paste("Question", i))
+  polygon(c(0:5,5:0)+6*(i-1), c(new_data$pl[new_data$Question==i], rev(new_data$pu[new_data$Question==i])), border=NA, col="#0000002F")
+  lines(0:5+6*(i-1), new_data$p[new_data$Question==i], lwd=2)
+  text(x=6*(i-1)+2.5, y=1, paste0("Q",i), adj=c(0.5,1))
+}
+dev.off()
+```
+
+Due to the magic that is HTML, both shiny apps are embedded below if you want to play around (will only work inside the Massey network).
+
+<iframe src="http://it056230.massey.ac.nz:8080/openday" width="960" height="600"></iframe>
+<br />
+<iframe src="http://it056230.massey.ac.nz:8080/openday_quiz" width="960" height="600"></iframe>
+
