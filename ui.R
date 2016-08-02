@@ -28,7 +28,7 @@ shinyUI(fluidPage(
   titlePanel("Sampling M&Ms"),
   fluidRow(
     column(width=3, plotOutput("data", height="700px")),
-    column(width=9, plotOutput("history"))
+    column(width=9, plotOutput("history", height="700px"))
   ),
   do.call(wellPanel, inputs)
   )
