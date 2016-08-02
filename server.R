@@ -1,9 +1,12 @@
 library(shiny)
+library(lubridate)
 
 source("sample_db.R")
 
 colours <- read.csv("colours.csv", stringsAsFactors=FALSE)
 vars    <- unlist(lapply(seq_len(nrow(colours)), function(x) { paste0("col", x) }))
+
+quiz_year = lubridate::year(Sys.Date())
 
 clamp <- function(x, xmin=0, xmax=20) {
   min(max(x, xmin), xmax)
@@ -44,7 +47,7 @@ shinyServer(function(input, output, session) {
     if (sum(sample) > 0) {
       # write the results to the database
       v$samples <- rbind(v$samples, sample)
-      if (!write_sample(colours$label, sample)) {
+      if (!write_sample(colours$label, sample, quiz_year)) {
         cat("Unable to write sample to database\n", file=stderr())
       }
     }

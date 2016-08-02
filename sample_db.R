@@ -24,7 +24,7 @@ create_database <- function(colours) {
     conn <- dbConnect(RMySQL::MySQL(), user='mandm', password='mandm', host='localhost', dbname='mandm')
 
     # create score table if not already there
-    fields <- paste(c("sample_id INT PRIMARY KEY AUTO_INCREMENT", sprintf("%s INT", colours)), collapse=",")
+    fields <- paste(c("sample_id INT PRIMARY KEY AUTO_INCREMENT", sprintf("%s INT", c(colours, "year"))), collapse=",")
 
     res <- dbSendQuery(conn, paste("CREATE TABLE IF NOT EXISTS samples (", fields, ");"))
     dbClearResult(res)
@@ -38,14 +38,14 @@ create_database <- function(colours) {
 }
 
 # write sample to the database if possible
-write_sample <- function(colours, sample) {
+write_sample <- function(colours, sample, year) {
   success <- FALSE
 
   try({
     conn <- dbConnect(RMySQL::MySQL(), user='mandm', password='mandm', host='localhost', dbname='mandm')
 
-    cols <- paste(colours, collapse=",")
-    vals <- paste(sample, collapse=",")
+    cols <- paste(c(colours,"year"), collapse=",")
+    vals <- paste(c(sample, year), collapse=",")
     sql  <- paste("INSERT INTO samples(",cols,") VALUES(",vals,");")
 
     res <- dbSendQuery(conn, sql)
