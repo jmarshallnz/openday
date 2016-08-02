@@ -85,7 +85,7 @@ shinyServer(function(input, output, session) {
     samples = as.matrix(v$samples[v$samples$year == quiz_year,wch])
     K <- min(100, nrow(samples))
     if (K > 0 && !is.null(samples)) {
-      history <- v$samples[1:K + nrow(samples) - K,, drop=FALSE]
+      history <- samples[1:K + nrow(samples) - K,, drop=FALSE]
 
       # Point estimates and CIs for our history
       n_hist <- rowSums(history)
