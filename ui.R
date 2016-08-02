@@ -27,7 +27,7 @@ inputs[[nrow(colours)+2]] <- actionButton("submit", label="Submit")
 shinyUI(fluidPage(
   titlePanel("Sampling M&Ms"),
   fluidRow(
-    column(width=3, plotOutput("data", height="600px")),
+    column(width=3, plotOutput("data", height="700px")),
     column(width=9, plotOutput("history"))
   ),
   do.call(wellPanel, inputs)
