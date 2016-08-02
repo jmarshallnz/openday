@@ -60,11 +60,18 @@ shinyServer(function(input, output, session) {
   # plot on the left shows actual data
   output$data <- renderPlot( {
     sample <- get_sample()
-    par(mfrow=c(2,1),mar=c(0,3,3,0), omi=c(0.5,0,0,0))
+    par(mfrow=c(3,1),mar=c(0,3,3,0), omi=c(0.5,0,0,0))
     barplot(sample, names = "", col=colours$col, ylim=c(0,max(sample, 5, na.rm=TRUE)), main="Sample", border=NA)
-    if (!is.null(v$samples)) {
-      popn <- colSums(v$samples)
+
+    samples = v$samples[v$samples$year == quiz_year,]
+    if (!is.null(samples)) {
+      popn <- colSums(samples)
       barplot(popn, names = "", col=colours$col, ylim=c(0,max(popn, 5, na.rm=TRUE)), main="Population", border=NA)
+    }
+    last_year = v$samples[v$samples$year == quiz_year - 1,]
+    if (!is.null(last_year)) {
+      popn <- colSums(last_year)
+      barplot(popn, names = "", col=colours$col, ylim=c(0,max(popn, 5, na.rm=TRUE)), main="Last Year", border=NA)
     }
   } )
   
@@ -73,9 +80,10 @@ shinyServer(function(input, output, session) {
     par(mfrow=c(nrow(colours), 1), mar=c(0,3,1,0), omi=c(0.5,0,0.5,0))
 
     # plot the last K items or so, along with cummulative information
-    K <- min(100, nrow(v$samples))
-    if (K > 0 && !is.null(v$samples)) {
-      history <- v$samples[1:K + nrow(v$samples) - K,, drop=FALSE]
+    samples = v$samples[v$samples$year == quiz_year,]
+    K <- min(100, nrow(samples))
+    if (K > 0 && !is.null(samples)) {
+      history <- v$samples[1:K + nrow(samples) - K,, drop=FALSE]
 
       # Point estimates and CIs for our history
       n_hist <- rowSums(history)
@@ -85,7 +93,7 @@ shinyServer(function(input, output, session) {
       
       # cummulative history
       cum_hist <- history
-      cum_hist[1,] <- cum_hist[1,] + colSums(v$samples[seq_len(nrow(v$samples)-K),, drop=FALSE])
+      cum_hist[1,] <- cum_hist[1,] + colSums(samples[seq_len(nrow(samples)-K),, drop=FALSE])
       if (nrow(cum_hist) > 1) # silly apply dropping dimensions...
         cum_hist <- apply(cum_hist, 2, cumsum)
       cum_hist <- sweep(cum_hist, 1, rowSums(cum_hist), FUN="/")
@@ -97,7 +105,7 @@ shinyServer(function(input, output, session) {
     for (i in seq_len(nrow(colours))) {
       plot(NULL, xlim=c(0,K+5), ylim=c(0,1), type="n", xaxt="n", xaxs="i", ann=FALSE, bty="n", las=2)
 
-      if (K > 0 && !is.null(v$samples)) {
+      if (K > 0 && !is.null(samples)) {
         # plot cummulative population values
         lines(1:K, cum_hist[,i], col=colours$col[i], lwd=2)
   
