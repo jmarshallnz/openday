@@ -7,7 +7,7 @@ read_samples <- function(colours) {
   try({
     conn <- dbConnect(RMySQL::MySQL(), user='mandm', password='mandm', host='localhost', dbname='mandm')
 
-    fields <- paste(colours, collapse=",")
+    fields <- paste(c(colours, "year"), collapse=",")
     values <- dbGetQuery(conn, paste("SELECT ",fields, " FROM samples"))
 
     dbDisconnect(conn)
