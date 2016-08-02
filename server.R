@@ -25,7 +25,7 @@ uci <- function(x, n) {
 
 shinyServer(function(input, output, session) {
 
-  v <- reactiveValues(samples = as.matrix(read_samples(colours$label)))
+  v <- reactiveValues(samples = read_samples(colours$label))
 
   # reactive that converts input into something we can plot/use
   get_sample <- reactive({
@@ -46,7 +46,7 @@ shinyServer(function(input, output, session) {
 
     if (sum(sample) > 0) {
       # write the results to the database
-      v$samples <- rbind(v$samples, sample)
+      v$samples <- rbind(v$samples, c(sample, quiz_year))
       if (!write_sample(colours$label, sample, quiz_year)) {
         cat("Unable to write sample to database\n", file=stderr())
       }
@@ -63,12 +63,13 @@ shinyServer(function(input, output, session) {
     par(mfrow=c(3,1),mar=c(0,3,3,0), omi=c(0.5,0,0,0))
     barplot(sample, names = "", col=colours$col, ylim=c(0,max(sample, 5, na.rm=TRUE)), main="Sample", border=NA)
 
-    samples = v$samples[v$samples$year == quiz_year,]
+    wch = which(!names(v$samples) %in% "year")
+    samples = as.matrix(v$samples[v$samples$year == quiz_year,wch])
     if (!is.null(samples)) {
       popn <- colSums(samples)
       barplot(popn, names = "", col=colours$col, ylim=c(0,max(popn, 5, na.rm=TRUE)), main="Population", border=NA)
     }
-    last_year = v$samples[v$samples$year == quiz_year - 1,]
+    last_year = as.matrix(v$samples[v$samples$year == quiz_year - 1,wch])
     if (!is.null(last_year)) {
       popn <- colSums(last_year)
       barplot(popn, names = "", col=colours$col, ylim=c(0,max(popn, 5, na.rm=TRUE)), main="Last Year", border=NA)
@@ -80,7 +81,8 @@ shinyServer(function(input, output, session) {
     par(mfrow=c(nrow(colours), 1), mar=c(0,3,1,0), omi=c(0.5,0,0.5,0))
 
     # plot the last K items or so, along with cummulative information
-    samples = v$samples[v$samples$year == quiz_year,]
+    wch = which(!names(v$samples) %in% "year")
+    samples = as.matrix(v$samples[v$samples$year == quiz_year,wch])
     K <- min(100, nrow(samples))
     if (K > 0 && !is.null(samples)) {
       history <- v$samples[1:K + nrow(samples) - K,, drop=FALSE]
