@@ -1,10 +1,6 @@
 # Buffon's Noodle simulator.
 library(bezier)
 
-D <- 1 # grid width
-Gx <- 5 # grid size in x
-Gy <- 5 # grid size in y
-
 # generate some points uniformly, then fit a bezier curve through them, and truncate at
 # length L. Then count the number of intersections.
 
