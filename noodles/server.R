@@ -166,6 +166,7 @@ shinyServer(function(input, output, session) {
       p1 <- calc_pi(meanX + 1.96*seX, L, D)
       p2 <- calc_pi(meanX - 1.96*seX, L, D)
       text(n$Gx,n$Gy,sprintf("%.03f - %.03f", p1, p2), adj=c(1,3.5), cex=2, col='blue')
+      text(n$Gx,0,sprintf("n=%i", n$run$n), adj=c(1,0), col='blue', cex=1)
     }
     box()
   } )
