@@ -62,8 +62,11 @@ shinyServer(function(input, output, session) {
     max_count <- max(samples, last_year, 5, na.rm = TRUE)
     if (!is.null(samples)) {
       t <- table(factor(samples, levels=0:max_count))
-      barplot(t, ylim=c(0,max(t, 5, na.rm=TRUE)), space=0, main="All Noodles")
-      abline(v=mean(samples, na.rm=TRUE)+0.5, col='red')
+      height <- max(t, 5, na.rm=TRUE)
+      barplot(t, ylim=c(0,height), space=0, main="All Noodles", xlab="Number of crosses")
+      crosses <- mean(samples, na.rm=TRUE)+0.5
+      abline(v=crosses, col='red', lwd=2)
+      text(x=crosses, y=height, 'Average crosses', col='red', adj=c(0.1,1))
     }
 #    if (!is.null(last_year)) {
 #      t <- table(factor(last_year, levels=0:max_count))
