@@ -51,7 +51,6 @@ write_row <- function(columns, values) {
     cols <- paste(columns[wch], collapse=",")
     vals <- paste(values[wch], collapse=",")
     sql  <- paste("INSERT INTO", table ,"(",cols,") VALUES(",vals,");")
-    success <- sql
   }
 
   try({
@@ -64,7 +63,7 @@ write_row <- function(columns, values) {
     }
 
     dbDisconnect(conn)
-    success <- ''
+    success <- TRUE
   }, silent=TRUE)
 
   success
