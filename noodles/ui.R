@@ -21,12 +21,14 @@ inputs <- list()
 inputs[[1]] <- h4("Sample input")
 inputs <- c(inputs, lapply(1:5, createInput, width="80px"))
 inputs[[length(inputs)+1]] <- actionButton("submit", label="Submit")
+inputs[[length(inputs)+1]] <- sliderInput("slider", label=NULL, value=0, min=0, max=100, step=1,
+                                          animate=animationOptions(interval=500, loop=TRUE))
 
 shinyUI(fluidPage(
   titlePanel("Throwing Noodles to estimate \U03C0"),
   fluidRow(
-    column(width=3, plotOutput("data", height="550px")),
-    column(width=9, plotOutput("history", height="550px"))
+    column(width=4, plotOutput("data", height="550px")),
+    column(width=8, plotOutput("history", height="550px"))
   ),
   do.call(wellPanel, inputs)
   )

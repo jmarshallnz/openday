@@ -2,27 +2,46 @@ library(shiny)
 library(lubridate)
 
 source("sample_db.R")
+#source("sample_csv.R")
+source("bezier_stuff.R")
 
 # size of noodles
 L <- 200
 D <- 70
 
+# storage
 vars    <- paste0("count", 1:5)
 columns <- c(vars, "year")
 
 current_year = lubridate::year(Sys.Date())
 
+# protect against silly input
 clamp <- function(x, xmin=0, xmax=20) {
   min(max(x, xmin), xmax)
 }
 
+# create database
 if (!create_database(columns)) {
   cat("Unable to create database\n", file=stderr());
+}
+
+# create a bunch of random noodles
+B <- replicate(100, gen_bezier(L=L/D), simplify = FALSE)
+
+# noodles to plot
+num_noodles <- 100
+
+# estimate pi
+calc_pi <- function(meanX, L, D) {
+  1/meanX * 2*L/D
 }
 
 shinyServer(function(input, output, session) {
 
   v <- reactiveValues(samples = read_rows(columns))
+  n <- reactiveValues(noodles = list(), points = NULL,
+                      run=list(n=0, K=0, Ex=0, Ex2=0),
+                      Gx=6, Gy=3)
 
   # reactive that converts input into something we can plot/use
   get_sample <- reactive({
@@ -41,7 +60,7 @@ shinyServer(function(input, output, session) {
     if (sum(!is.na(sample)) > 0) {
       # write the results to the database
       v$samples <- rbind(v$samples, c(sample, current_year))
-      if (write_row(columns, c(sample, current_year))) {
+      if (!write_row(columns, c(sample, current_year))) {
         cat("Unable to write sample to database\n", file=stderr())
       }
     }
@@ -50,17 +69,39 @@ shinyServer(function(input, output, session) {
     for (i in seq_along(vars))
       updateNumericInput(session, vars[i], value=NA)
   })
+  
+  observeEvent(input$slider, {
+    # remove a noodle
+    if (length(n$noodles) > num_noodles) {
+      n$noodles <- n$noodles[-1]
+    }
+    # generate a new noodle
+    noodle <- rand_bezier(B, n$Gx, n$Gy)
+    # count how many times it crosses
+    points <- intersect_bezier(noodle)
+    x <- nrow(points)
+    # update our values
+    n$run$n = n$run$n + 1
+    n$run$Ex = n$run$Ex + x
+    n$run$Ex2 = n$run$Ex2 + x^2
+    # add to our noodle list to update the plot
+    n$noodles[[length(n$noodles)+1]] <- noodle
+    n$points <- points
+  })
 
   # plot on the left shows actual data
   output$data <- renderPlot( {
     sample <- get_sample()
     par(mfrow=c(2,1),mar=c(2,3,3,0), omi=c(0.5,0,0,0))
 #    par(mfrow=c(3,1),mar=c(0,3,3,0), omi=c(0.5,0,0,0))
-    t <- table(factor(sample, levels=0:5))
-    barplot(t, ylim=c(0,max(sample, 5, na.rm=TRUE)), space=0, main="Sample")
+    max_count <- max(sample, 5, na.rm = TRUE)
+    t <- table(factor(sample, levels=0:max_count))
+    height <- max(t, 5, na.rm=TRUE)
+    barplot(t, ylim=c(0,height), space=0, main="Sample")
     crosses <- mean(sample, na.rm=TRUE)
     if (!is.nan(crosses)) {
-      abline(v=2/pi*L/D+0.5, col='black', lty='dotted', lwd=2)
+      meanX <- 2/pi*L/D
+      abline(v=meanX+0.5, col='black', lty='dotted', lwd=2)
       abline(v=crosses+0.5, col='red', lwd=2)
       if (crosses < 2/pi * L/D) {
         mtext(side=3, at=crosses+0.5, 'Average crosses', col='red', adj=1.1)
@@ -69,26 +110,31 @@ shinyServer(function(input, output, session) {
         mtext(side=3, at=crosses+0.5, 'Average crosses', col='red', adj=-0.1)
         mtext(side=3, at=2/pi*L/D+0.5, 'Expected crosses', col='black', adj=1.1)
       }
+      PI <- calc_pi(crosses, L, D)
+      text(max_count+1,height,substitute(paste(pi, phantom() %~~% phantom(), PI, sep=''), list(PI=sprintf("%.03f", PI))), adj=c(1,1.1), cex=1, col='blue')
     }
 
     wch = which(!names(v$samples) %in% "year")
     samples = na.omit(as.numeric(as.matrix(v$samples[v$samples$year == current_year,wch])))
     last_year = na.omit(as.numeric(as.matrix(v$samples[v$samples$year == current_year - 1,wch])))
     max_count <- max(samples, last_year, 5, na.rm = TRUE)
-    if (!is.null(samples)) {
+    if (length(samples) > 0) {
       t <- table(factor(samples, levels=0:max_count))
       height <- max(t, 4, na.rm=TRUE)+1
       barplot(t, ylim=c(0,height), space=0, main="All Noodles", xlab="Number of crosses")
       crosses <- mean(samples, na.rm=TRUE)
-      abline(v=2/pi*L/D+0.5, col='black', lty='dotted', lwd=2)
+      meanX <- 2/pi*L/D
+      abline(v=meanX+0.5, col='black', lty='dotted', lwd=2)
       abline(v=crosses+0.5, col='red', lwd=2)
-      if (crosses < 2/pi * L/D) {
+      if (crosses < meanX) {
         mtext(side=3, at=crosses+0.5, 'Average crosses', col='red', adj=1.1)
-        mtext(side=3, at=2/pi*L/D+0.5, 'Expected crosses', col='black', adj=-0.1)
+        mtext(side=3, at=meanX+0.5, 'Expected crosses', col='black', adj=-0.1)
       } else {
         mtext(side=3, at=crosses+0.5, 'Average crosses', col='red', adj=-0.1)
-        mtext(side=3, at=2/pi*L/D+0.5, 'Expected crosses', col='black', adj=1.1)
+        mtext(side=3, at=meanX+0.5, 'Expected crosses', col='black', adj=1.1)
       }
+      PI <- calc_pi(crosses, L, D)
+      text(max_count+1,height,substitute(paste(pi, phantom() %~~% phantom(), PI, sep=''), list(PI=sprintf("%.02f", PI))), adj=c(1,1.1), cex=2, col='blue')
     }
 #    if (!is.null(last_year)) {
 #      t <- table(factor(last_year, levels=0:max_count))
@@ -96,52 +142,32 @@ shinyServer(function(input, output, session) {
 #    }
   } )
 
-  # plot the history...
-  # output$history <- renderPlot( {
-  #   par(mfrow=c(nrow(colours), 1), mar=c(0,3,1,0), omi=c(0.5,0,0.5,0))
-  # 
-  #   # plot the last K items or so, along with cummulative information
-  #   wch = which(!names(v$samples) %in% "year")
-  #   samples = as.matrix(v$samples[v$samples$year == current_year,wch])
-  #   K <- min(100, nrow(samples))
-  #   if (K > 0 && !is.null(samples)) {
-  #     history <- samples[1:K + nrow(samples) - K,, drop=FALSE]
-  # 
-  #     # Point estimates and CIs for our history
-  #     n_hist <- rowSums(history)
-  #     p_hist <- sweep(history, 1, n_hist, FUN="/")
-  #     l_hist <- lci(history, n_hist)
-  #     u_hist <- uci(history, n_hist)
-  #     
-  #     # cummulative history
-  #     cum_hist <- history
-  #     cum_hist[1,] <- cum_hist[1,] + colSums(samples[seq_len(nrow(samples)-K),, drop=FALSE])
-  #     if (nrow(cum_hist) > 1) # silly apply dropping dimensions...
-  #       cum_hist <- apply(cum_hist, 2, cumsum)
-  #     cum_hist <- sweep(cum_hist, 1, rowSums(cum_hist), FUN="/")
-  #   }
-  # 
-  #   hist_step <- 0.07
-  #   hist_breaks <- seq(0,hist_step*ceiling(1/hist_step),by=hist_step)
-  #   # plots...
-  #   for (i in seq_len(nrow(colours))) {
-  #     plot(NULL, xlim=c(0,K+5), ylim=c(0,1), type="n", xaxt="n", xaxs="i", ann=FALSE, bty="n", las=2)
-  # 
-  #     if (K > 0 && !is.null(samples)) {
-  #       # plot cummulative population values
-  #       lines(1:K, cum_hist[,i], col=colours$col[i], lwd=2)
-  # 
-  #       # plot each estimate as a point estimate and CI
-  #       segments(1:K, l_hist[,i], 1:K, u_hist[,i], col=colours$col[i])
-  #       points(1:K, p_hist[,i], col=colours$col[i], pch=19, cex=1)
-  # 
-  #       # and at the end plot a histogram of the sample point estimates
-  #       h <- hist(p_hist[,i], breaks=hist_breaks, plot=FALSE)
-  #       rect(rep(K+2,10), hist_breaks[-length(hist_breaks)],
-  #            rep(K+2,10)+ 3 * h$density/max(h$density), hist_breaks[-1], col=colours$col[i], border=NA)
-  #     }
-  #   }
-  #   mtext("Estimating the population using samples", side=3, outer=TRUE, at=0.5, line=1, font=2, cex=1.2)
-  # })
+  # plot the simulation
+  output$history <- renderPlot( {
+    par(mar=c(1,1,2,1))
+    # compute n$Gy from n$Gx and dim
+    n$Gy <- n$Gx * par()$pin[2] / par()$pin[1]
+    plot(NULL, xlim=c(0,n$Gx), ylim=c(0,n$Gy), asp=1, axes=FALSE, xlab="", ylab="")
+    abline(v=seq(0, n$Gx, by=1))
+    if (length(n$noodles) > 1) {
+      lapply(1:(length(n$noodles)-1), function(i) {
+        lines(n$noodles[[i]], col=rgb(0,0,0,alpha=0.5-0.5*(length(n$noodles)-i)/num_noodles), lwd=2)
+        })
+      lines(n$noodles[[length(n$noodles)]], col='black', lwd=3)
+      points(n$points, col='red', pch=19, cex=2)
+    }
+    title("Simulated noodles")
+    if (n$run$n > 1) {
+      meanX <- n$run$Ex/n$run$n
+      sdX   <- sqrt((n$run$Ex2 - (n$run$Ex*n$run$Ex)/n$run$n) / (n$run$n-1))
+      seX  <-  sdX / sqrt(n$run$n)
+      PI <- calc_pi(meanX, L, D)
+      text(n$Gx,n$Gy,substitute(paste(pi, phantom() %~~% phantom(), PI, sep=''), list(PI=sprintf("%.03f", PI))), adj=c(1,1), cex=5, col='blue')
+      p1 <- calc_pi(meanX + 1.96*seX, L, D)
+      p2 <- calc_pi(meanX - 1.96*seX, L, D)
+      text(n$Gx,n$Gy,sprintf("%.03f - %.03f", p1, p2), adj=c(1,3.5), cex=2, col='blue')
+    }
+    box()
+  } )
 
 })
