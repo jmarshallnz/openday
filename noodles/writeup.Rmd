@@ -1,0 +1,72 @@
+---
+title: "Throwing noodles on the floor to estimate $\\pi$"
+output:
+  pdf_document: default
+---
+
+\pagenumbering{gobble}
+
+It turns out that the expected number of times a thrown noodle will cross the cracks between floor boards depends only on it's length and the width of the floor boards: It doesn't depend on the shape of the noodle at all.
+
+```{r, fig.width=5, fig.height=2, fig.align='center', echo=FALSE, dev='tikz'}
+# do a noodle
+source('bezier_stuff.R')
+set.seed(2)
+text_size <- 1
+arrow_size <- 0.05
+D <- 0.5
+par(mai=c(0,0,0,2))
+plot(NULL, xlim=c(0,3), ylim=c(0.5,2.5), asp=1, axes=FALSE, xlab="", ylab="")
+abline(v=seq(0, 3, by=D))
+B <- gen_bezier(3)
+r <- rand_bezier(B, 5, 3)
+r[,1] <- r[,1] - 3.2
+r <- r * 2
+p <- intersect_bezier(r)
+p <- p / 2
+r <- r / 2
+lines(r, col='black', lwd=3)
+points(p, col='black', cex=1.5)
+arrows(2,0.6,2.5, length=arrow_size, angle=20, code=3)
+text(2.25,0.6, 'D', adj = c(0.5,-0.2), cex=text_size)
+text(1.3,1.25,'L', srt=-35, cex=text_size)
+rm <- r[23:43,]
+rm[,2] <- rm[,2]+0.13
+#points(rm)
+lines(rm[-1,])
+arrows(x0=rm[1,1], y0=rm[1,2], x1=rm[2,1], y1=rm[2,2], length=arrow_size, angle=20, code=1)
+
+rm <- r[65:52,]
+rm[,2] <- rm[,2]+0.13
+lines(rm[-1,])
+arrows(x0=rm[1,1], y0=rm[1,2], x1=rm[2,1], y1=rm[2,2], length=arrow_size, angle=20, code=1)
+box()
+mtext(expression(atop("Expected Number","of Crosses:")), side=4, at=2, las=1, adj=0.5, line=5)
+mtext("$\\frac{2}{\\pi}\\frac{L}{D}$", side=4, at=1.3, las=1, adj=0.5, line=5, cex=3)
+```
+
+This is a generalisation of the famous "Buffon's Needle" problem, one of the earliest problems in geometric probability, named after Georges-Louis Leclerc, Comte de Buffon (1707-1788). In that problem, the probability of a thrown needle crossing the gaps between wooden floor boards is derived.
+
+To see why the formula works for noodles, imagine if you chopped it into lots of tiny noodle segments each the same length, then you'd expect the number of times each would cross across lots of throws to be the same. Thus, you'd expect the number of times the noodle crosses a crack to be proportional to it's length:
+$$
+\mathsf{Expected\ Number\ of\ Crosses} = \alpha \times L
+$$
+All we need to do is work out what the constant of proportionality, $\alpha$ would be.
+
+If the noodle was a circle with diameter $D$ (the width of each floor board) then no matter how you throw it, it's guaranteed to always cross exactly twice. So, for this special case, we must have:
+$2 = \alpha \times \pi D$ so that $\alpha = \frac{2}{\pi D}$.
+
+### Estimating $\pi$
+
+We can use this to estimate $\pi$ through **Monte Carlo simulation**. By rearranging the formula, we see that
+$$
+\begin{aligned}
+\pi &= \mathsf{Expected\ number\ of\ Crosses} \times \frac{2D}{L}\\
+&\approx \frac{\mathsf{Number\ of\ Crosses}}{\mathsf{Number\ of\ Throws}} \times \frac{2D}{L}\\
+\end{aligned}
+$$
+so if we throw enough noodles we should get a reasonable approximation to $\pi$.
+
+### Ants use this idea to find good nests
+
+Studies\footnote{S.T. Mugford, E.B. Mallon and N.R. Franks (2001) "The Accuracy of Buffon's Needle: A Rule of Thumb Used by Ants to Estimate Area." \emph{Behavioural Ecology} 12 (6): 655--658.} have shown that ants use a version of this result to estimate the area of a potential nest site. Each ant wanders around the site laying a pheromone trail and later returns, counting the number of times they cross their previous trail. By using the length of the two trails and the number of crosses they can get a pretty good estimate of the area of the nest site.
