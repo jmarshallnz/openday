@@ -49,12 +49,16 @@ write_row <- function(columns, values) {
   try({
     conn <- dbConnect(RMySQL::MySQL(), user=user, password=pass, host='localhost', dbname=db)
 
-    cols <- paste(columns, collapse=",")
-    vals <- paste(values, collapse=",")
-    sql  <- paste("INSERT INTO", table ,"(",cols,") VALUES(",vals,");")
+    # ignore NAs
+    wch <- !is.na(values)
+    if (length(wch) > 0) {
+      cols <- paste(columns[wch], collapse=",")
+      vals <- paste(values[wch], collapse=",")
+      sql  <- paste("INSERT INTO", table ,"(",cols,") VALUES(",vals,");")
 
-    res <- dbSendQuery(conn, sql)
-    dbClearResult(res)
+      res <- dbSendQuery(conn, sql)
+      dbClearResult(res)
+    }
 
     dbDisconnect(conn)
     success <- TRUE
