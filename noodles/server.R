@@ -3,6 +3,10 @@ library(lubridate)
 
 source("sample_db.R")
 
+# size of noodles
+L <- 200
+D <- 70
+
 vars    <- paste0("count", 1:5)
 columns <- c(vars, "year")
 
@@ -62,11 +66,12 @@ shinyServer(function(input, output, session) {
     max_count <- max(samples, last_year, 5, na.rm = TRUE)
     if (!is.null(samples)) {
       t <- table(factor(samples, levels=0:max_count))
-      height <- max(t, 5, na.rm=TRUE)
+      height <- max(t, 4, na.rm=TRUE)+1
       barplot(t, ylim=c(0,height), space=0, main="All Noodles", xlab="Number of crosses")
       crosses <- mean(samples, na.rm=TRUE)+0.5
+      abline(v=2/pi*L/D, col='black', lty='dotted')
       abline(v=crosses, col='red', lwd=2)
-      text(x=crosses, y=height, 'Average crosses', col='red', adj=c(0.1,1))
+      text(x=crosses, y=height, 'Average crosses', col='red', adj=c(-0.1,1))
     }
 #    if (!is.null(last_year)) {
 #      t <- table(factor(last_year, levels=0:max_count))
