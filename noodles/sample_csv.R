@@ -1,10 +1,11 @@
+db_file <- "db.csv"
 
 # fetch from the database if possible
 read_rows <- function(columns) {
   values <- NULL
 
   try({
-    values = read.csv("db.csv")
+    values = read.csv(db_file)
   }, silent=TRUE)
 
   values
@@ -16,11 +17,13 @@ create_database <- function(columns) {
 
   try({
     # check if file exists
-    if (!file.exists("db.csv")) {
+    if (!file.exists(db_file)) {
       # otherwise, create it
-      scores <- matrix(NA, 1, length(colours))
-      colnames(scores) <- colours
-      write.csv(scores, "mandm.csv", row.names=FALSE)
+      db <- matrix(NA, 1, length(columns))
+      colnames(db) <- columns
+      write.csv(db, db_file, row.names=FALSE)
+    }
+    success <- TRUE
     }, silent=TRUE)
 
   success
@@ -30,26 +33,10 @@ create_database <- function(columns) {
 write_row <- function(columns, values) {
   success <- FALSE
 
-  wch <- which(!is.na(values))
-  if (length(wch) > 0) {
-    cols <- paste(columns[wch], collapse=",")
-    vals <- paste(values[wch], collapse=",")
-    sql  <- paste("INSERT INTO", table ,"(",cols,") VALUES(",vals,");")
-  }
-
   try({
-    scores <- read.csv("mandm.csv")
-    scores <- rbind(scores, sample)
-    write.csv(scores, "mandm.csv", row.names=FALSE)
-  
-    
-    # ignore NAs
-    if (length(wch) > 0) {
-      res <- dbSendQuery(conn, sql)
-      dbClearResult(res)
-    }
-
-    dbDisconnect(conn)
+    db <- read.csv(db_file)
+    db <- rbind(db, values)
+    write.csv(db, db_file, row.names=FALSE)
     success <- TRUE
   }, silent=TRUE)
 
