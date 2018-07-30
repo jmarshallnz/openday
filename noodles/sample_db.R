@@ -50,7 +50,7 @@ write_row <- function(columns, values) {
     conn <- dbConnect(RMySQL::MySQL(), user=user, password=pass, host='localhost', dbname=db)
 
     # ignore NAs
-    wch <- !is.na(values)
+    wch <- which(!is.na(values))
     if (length(wch) > 0) {
       cols <- paste(columns[wch], collapse=",")
       vals <- paste(values[wch], collapse=",")
