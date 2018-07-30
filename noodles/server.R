@@ -71,7 +71,13 @@ shinyServer(function(input, output, session) {
       crosses <- mean(samples, na.rm=TRUE)+0.5
       abline(v=2/pi*L/D, col='black', lty='dotted')
       abline(v=crosses, col='red', lwd=2)
-      text(x=crosses, y=height, 'Average crosses', col='red', adj=c(-0.1,1))
+      if (crosses < 2/pi * L/D) {
+        text(x=crosses, y=height, 'Average crosses', col='red', adj=c(1.1,1))
+        text(x=2/pi*L/D, y=height, 'Expected crosses', col='black', adj=c(-0.1,1))
+      } else {
+        text(x=crosses, y=height, 'Average crosses', col='red', adj=c(-0.1,1))
+        text(x=2/pi*L/D, y=height, 'Expected crosses', col='black', adj=c(1.1,1))
+      }
     }
 #    if (!is.null(last_year)) {
 #      t <- table(factor(last_year, levels=0:max_count))
