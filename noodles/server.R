@@ -72,11 +72,11 @@ shinyServer(function(input, output, session) {
       abline(v=2/pi*L/D, col='black', lty='dotted')
       abline(v=crosses, col='red', lwd=2)
       if (crosses < 2/pi * L/D) {
-        text(x=crosses, y=height, 'Average crosses', col='red', adj=c(1.1,1))
-        text(x=2/pi*L/D, y=height, 'Expected crosses', col='black', adj=c(-0.1,1))
+        mtext(side=3, at=crosses, 'Average crosses', col='red', adj=1.1)
+        mtext(side=3, at=2/pi*L/D, 'Expected crosses', col='black', adj=-0.1)
       } else {
-        text(x=crosses, y=height, 'Average crosses', col='red', adj=c(-0.1,1))
-        text(x=2/pi*L/D, y=height, 'Expected crosses', col='black', adj=c(1.1,1))
+        mtext(side=3, at=crosses, 'Average crosses', col='red', adj=-0.1)
+        mtext(side=3, at=2/pi*L/D, 'Expected crosses', col='black', adj=1.1)
       }
     }
 #    if (!is.null(last_year)) {
