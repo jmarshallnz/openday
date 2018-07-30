@@ -32,12 +32,9 @@ shinyServer(function(input, output, session) {
 
   # make the submit button do something useful
   observeEvent(input$submit, {
-    # TODO:reset our input controls
-    cat("button hit\n")
-
     sample <- get_sample()
 
-    if (sum(sample) > 0) {
+    if (sum(!is.na(sample)) > 0) {
       # write the results to the database
       v$samples <- rbind(v$samples, c(sample, current_year))
       if (!write_row(columns, c(sample, current_year))) {
@@ -47,7 +44,7 @@ shinyServer(function(input, output, session) {
 
     # reset our input controls
     for (i in seq_along(vars))
-      updateNumericInput(session, vars[i], value=0)
+      updateNumericInput(session, vars[i], value=NA)
   })
 
   # plot on the left shows actual data
@@ -56,7 +53,7 @@ shinyServer(function(input, output, session) {
     par(mfrow=c(3,1),mar=c(0,3,3,0), omi=c(0.5,0,0,0))
     t <- table(factor(sample, levels=0:5))
     barplot(t, ylim=c(0,max(sample, 5, na.rm=TRUE)), space=0, main="Sample")
-    abline(v=mean(sample), col='red')
+    abline(v=mean(sample)+0.5, col='red')
 
     wch = which(!names(v$samples) %in% "year")
     samples = as.numeric(as.matrix(v$samples[v$samples$year == current_year,wch]))
@@ -65,6 +62,7 @@ shinyServer(function(input, output, session) {
     if (!is.null(samples)) {
       t <- table(factor(samples, levels=0:max_count))
       barplot(t, ylim=c(0,max(t, 5, na.rm=TRUE)), space=0, main="Population")
+      abline(v=mean(sample)+0.5, col='red')
     }
     if (!is.null(last_year)) {
       t <- table(factor(last_year, levels=0:max_count))

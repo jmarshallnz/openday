@@ -14,7 +14,7 @@ inlineNumeric<-function (inputId, label, value = 0, min = NULL, max = NULL, step
 }
 
 createInput <- function(num, width="80px") {
-  inlineNumeric(inputId=paste0("count",num), label=paste("Noodle", num), value = 0, min = 0, max = 20, width=width)
+  inlineNumeric(inputId=paste0("count",num), label=paste("Noodle", num), value = NA, min = 0, max = 20, width=width)
 }
 
 inputs <- list()
