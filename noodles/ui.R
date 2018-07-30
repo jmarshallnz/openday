@@ -13,13 +13,13 @@ inlineNumeric<-function (inputId, label, value = 0, min = NULL, max = NULL, step
       tags$input(id = inputId, type="number", class="form-control", value = value, min=min, max=max, step=step, style=text_style))
 }
 
-createInput <- function(num, colours, width="80px") {
+createInput <- function(num, width="80px") {
   inlineNumeric(inputId=paste0("count",num), label=paste("Noodle", num), value = 0, min = 0, max = 20, width=width)
 }
 
 inputs <- list()
 inputs[[1]] <- h4("Sample input")
-inputs <- c(inputs, lapply(1:5, createInput, colours, width="80px"))
+inputs <- c(inputs, lapply(1:5, createInput, width="80px"))
 inputs[[nrow(colours)+2]] <- actionButton("submit", label="Submit")
 
 shinyUI(fluidPage(
