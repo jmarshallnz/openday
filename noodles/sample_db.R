@@ -55,7 +55,7 @@ write_row <- function(columns, values) {
       cols <- paste(columns[wch], collapse=",")
       vals <- paste(values[wch], collapse=",")
       sql  <- paste("INSERT INTO", table ,"(",cols,") VALUES(",vals,");")
-      cat("SQL is:", sql, "\n")
+      cat("SQL is:", sql, "\n", file=stderr())
 
       res <- dbSendQuery(conn, sql)
       dbClearResult(res)
