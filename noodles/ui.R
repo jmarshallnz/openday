@@ -20,7 +20,7 @@ createInput <- function(num, width="80px") {
 inputs <- list()
 inputs[[1]] <- h4("Sample input")
 inputs <- c(inputs, lapply(1:5, createInput, width="80px"))
-inputs[[nrow(colours)+2]] <- actionButton("submit", label="Submit")
+inputs[[length(inputs)+1]] <- actionButton("submit", label="Submit")
 
 shinyUI(fluidPage(
   titlePanel("Throwing Noodles to estimate \U03C0"),
