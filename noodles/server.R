@@ -59,14 +59,16 @@ shinyServer(function(input, output, session) {
     t <- table(factor(sample, levels=0:5))
     barplot(t, ylim=c(0,max(sample, 5, na.rm=TRUE)), space=0, main="Sample")
     crosses <- mean(sample, na.rm=TRUE)
-    abline(v=2/pi*L/D+0.5, col='black', lty='dotted', lwd=2)
-    abline(v=crosses+0.5, col='red', lwd=2)
-    if (crosses < 2/pi * L/D) {
-      mtext(side=3, at=crosses+0.5, 'Average crosses', col='red', adj=1.1)
-      mtext(side=3, at=2/pi*L/D+0.5, 'Expected crosses', col='black', adj=-0.1)
-    } else {
-      mtext(side=3, at=crosses+0.5, 'Average crosses', col='red', adj=-0.1)
-      mtext(side=3, at=2/pi*L/D+0.5, 'Expected crosses', col='black', adj=1.1)
+    if (!is.nan(crosses)) {
+      abline(v=2/pi*L/D+0.5, col='black', lty='dotted', lwd=2)
+      abline(v=crosses+0.5, col='red', lwd=2)
+      if (crosses < 2/pi * L/D) {
+        mtext(side=3, at=crosses+0.5, 'Average crosses', col='red', adj=1.1)
+        mtext(side=3, at=2/pi*L/D+0.5, 'Expected crosses', col='black', adj=-0.1)
+      } else {
+        mtext(side=3, at=crosses+0.5, 'Average crosses', col='red', adj=-0.1)
+        mtext(side=3, at=2/pi*L/D+0.5, 'Expected crosses', col='black', adj=1.1)
+      }
     }
 
     wch = which(!names(v$samples) %in% "year")
