@@ -61,8 +61,8 @@ $2 = \alpha \times \pi D$ so that $\alpha = \frac{2}{\pi D}$.
 We can use this to estimate $\pi$ through **Monte Carlo simulation**. By rearranging the formula, we see that
 $$
 \begin{aligned}
-\pi &= \mathsf{Expected\ number\ of\ Crosses} \times \frac{2D}{L}\\
-&\approx \frac{\mathsf{Number\ of\ Crosses}}{\mathsf{Number\ of\ Throws}} \times \frac{2D}{L}\\
+\pi &= \frac{1}{\mathsf{Expected\ number\ of\ Crosses}} \times \frac{2L}{D}\\
+&\approx \frac{\mathsf{Number\ of\ Throws}}{\mathsf{Number\ of\ Crosses}} \times \frac{2L}{D}\\
 \end{aligned}
 $$
 so if we throw enough noodles we should get a reasonable approximation to $\pi$.
