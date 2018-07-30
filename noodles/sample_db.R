@@ -46,23 +46,25 @@ create_database <- function(columns) {
 write_row <- function(columns, values) {
   success <- FALSE
 
+  wch <- which(!is.na(values))
+  if (length(wch) > 0) {
+    cols <- paste(columns[wch], collapse=",")
+    vals <- paste(values[wch], collapse=",")
+    sql  <- paste("INSERT INTO", table ,"(",cols,") VALUES(",vals,");")
+    success <- sql
+  }
+
   try({
     conn <- dbConnect(RMySQL::MySQL(), user=user, password=pass, host='localhost', dbname=db)
 
     # ignore NAs
-    wch <- which(!is.na(values))
     if (length(wch) > 0) {
-      cols <- paste(columns[wch], collapse=",")
-      vals <- paste(values[wch], collapse=",")
-      sql  <- paste("INSERT INTO", table ,"(",cols,") VALUES(",vals,");")
-      cat("SQL is:", sql, "\n", file=stderr())
-
       res <- dbSendQuery(conn, sql)
       dbClearResult(res)
     }
 
     dbDisconnect(conn)
-    success <- TRUE
+    success <- ''
   }, silent=TRUE)
 
   success

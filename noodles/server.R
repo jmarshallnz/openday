@@ -41,7 +41,9 @@ shinyServer(function(input, output, session) {
     if (sum(!is.na(sample)) > 0) {
       # write the results to the database
       v$samples <- rbind(v$samples, c(sample, current_year))
-      if (!write_row(columns, c(sample, current_year))) {
+      sql <- write_row(columns, c(sample, current_year))
+      if (nchar(sql) > 0) {
+        cat(sql, file=stderr())
         cat("Unable to write sample to database\n", file=stderr())
       }
     }
