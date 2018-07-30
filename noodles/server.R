@@ -50,7 +50,7 @@ shinyServer(function(input, output, session) {
   # plot on the left shows actual data
   output$data <- renderPlot( {
     sample <- get_sample()
-    par(mfrow=c(2,1),mar=c(0,3,3,0), omi=c(0.5,0,0,0))
+    par(mfrow=c(2,1),mar=c(2,3,3,0), omi=c(0.5,0,0,0))
 #    par(mfrow=c(3,1),mar=c(0,3,3,0), omi=c(0.5,0,0,0))
     t <- table(factor(sample, levels=0:5))
     barplot(t, ylim=c(0,max(sample, 5, na.rm=TRUE)), space=0, main="Sample")
@@ -62,7 +62,7 @@ shinyServer(function(input, output, session) {
     max_count <- max(samples, last_year, 5, na.rm = TRUE)
     if (!is.null(samples)) {
       t <- table(factor(samples, levels=0:max_count))
-      barplot(t, ylim=c(0,max(t, 5, na.rm=TRUE)), space=0, main="Population")
+      barplot(t, ylim=c(0,max(t, 5, na.rm=TRUE)), space=0, main="All Noodles")
       abline(v=mean(samples, na.rm=TRUE)+0.5, col='red')
     }
 #    if (!is.null(last_year)) {
