@@ -39,8 +39,8 @@ shinyServer(function(input, output, session) {
 
     if (sum(sample) > 0) {
       # write the results to the database
-      v$samples <- rbind(v$samples, c(sample, quiz_year))
-      if (!write_row(columns, c(sample, quiz_year))) {
+      v$samples <- rbind(v$samples, c(sample, current_year))
+      if (!write_row(columns, c(sample, current_year))) {
         cat("Unable to write sample to database\n", file=stderr())
       }
     }
@@ -59,8 +59,8 @@ shinyServer(function(input, output, session) {
     abline(v=mean(sample), col='red')
 
     wch = which(!names(v$samples) %in% "year")
-    samples = as.numeric(as.matrix(v$samples[v$samples$year == quiz_year,wch]))
-    last_year = as.numeric(as.matrix(v$samples[v$samples$year == quiz_year - 1,wch]))
+    samples = as.numeric(as.matrix(v$samples[v$samples$year == current_year,wch]))
+    last_year = as.numeric(as.matrix(v$samples[v$samples$year == current_year - 1,wch]))
     max_count <- max(samples, last_year)
     if (!is.null(samples)) {
       t <- table(factor(samples, levels=0:max_count))
@@ -78,7 +78,7 @@ shinyServer(function(input, output, session) {
   # 
   #   # plot the last K items or so, along with cummulative information
   #   wch = which(!names(v$samples) %in% "year")
-  #   samples = as.matrix(v$samples[v$samples$year == quiz_year,wch])
+  #   samples = as.matrix(v$samples[v$samples$year == current_year,wch])
   #   K <- min(100, nrow(samples))
   #   if (K > 0 && !is.null(samples)) {
   #     history <- samples[1:K + nrow(samples) - K,, drop=FALSE]
