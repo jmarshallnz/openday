@@ -61,7 +61,7 @@ shinyServer(function(input, output, session) {
     wch = which(!names(v$samples) %in% "year")
     samples = as.numeric(as.matrix(v$samples[v$samples$year == current_year,wch]))
     last_year = as.numeric(as.matrix(v$samples[v$samples$year == current_year - 1,wch]))
-    max_count <- max(samples, last_year)
+    max_count <- max(samples, last_year, 5)
     if (!is.null(samples)) {
       t <- table(factor(samples, levels=0:max_count))
       barplot(t, ylim=c(0,max(t, 5, na.rm=TRUE)), space=0, main="Population")
