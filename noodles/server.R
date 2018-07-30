@@ -58,7 +58,16 @@ shinyServer(function(input, output, session) {
 #    par(mfrow=c(3,1),mar=c(0,3,3,0), omi=c(0.5,0,0,0))
     t <- table(factor(sample, levels=0:5))
     barplot(t, ylim=c(0,max(sample, 5, na.rm=TRUE)), space=0, main="Sample")
-    abline(v=mean(sample, na.rm=TRUE)+0.5, col='red')
+    crosses <- mean(sample, na.rm=TRUE)+0.5
+    abline(v=2/pi*L/D+0.5, col='black', lty='dotted', lwd=2)
+    abline(v=crosses, col='red', lwd=2)
+    if (crosses < 2/pi * L/D) {
+      mtext(side=3, at=crosses, 'Average crosses', col='red', adj=1.1)
+      mtext(side=3, at=2/pi*L/D, 'Expected crosses', col='black', adj=-0.1)
+    } else {
+      mtext(side=3, at=crosses, 'Average crosses', col='red', adj=-0.1)
+      mtext(side=3, at=2/pi*L/D, 'Expected crosses', col='black', adj=1.1)
+    }
 
     wch = which(!names(v$samples) %in% "year")
     samples = na.omit(as.numeric(as.matrix(v$samples[v$samples$year == current_year,wch])))
@@ -69,7 +78,7 @@ shinyServer(function(input, output, session) {
       height <- max(t, 4, na.rm=TRUE)+1
       barplot(t, ylim=c(0,height), space=0, main="All Noodles", xlab="Number of crosses")
       crosses <- mean(samples, na.rm=TRUE)+0.5
-      abline(v=2/pi*L/D, col='black', lty='dotted')
+      abline(v=2/pi*L/D+0.5, col='black', lty='dotted', lwd=2)
       abline(v=crosses, col='red', lwd=2)
       if (crosses < 2/pi * L/D) {
         mtext(side=3, at=crosses, 'Average crosses', col='red', adj=1.1)
