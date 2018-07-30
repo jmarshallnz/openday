@@ -2,8 +2,6 @@
 library(bezier)
 
 D <- 1 # grid width
-L <- 2 # noodle length (can be longer than D)
-
 Gx <- 5 # grid size in x
 Gy <- 5 # grid size in y
 
@@ -78,18 +76,3 @@ intersect_bezier <- function(b) {
   }
   p
 }
-
-plot(NULL, xlim=c(-0.5,Gx+0.5), ylim=c(-0.5,Gy+0.5), asp=1)
-#  abline(v=0:Gx)
-num_noodles <- 10000
-L <- 4
-B <- replicate(10,gen_bezier(L))
-
-r <- replicate(num_noodles, rand_bezier(B, Gx, Gy), simplify=FALSE)
-p <- lapply(r, intersect_bezier)
-junk <- lapply(r, lines, col='#0000001f')
-junk <- lapply(p, points, pch='.', col='red')
-i <- unlist(lapply(p, nrow))
-expected <- 2*L/(D*pi)*length(r)
-sum(i) / expected
-sum(i) / expected * pi
