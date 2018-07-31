@@ -97,8 +97,9 @@ shinyServer(function(input, output, session) {
     n$run$n = n$run$n + 1
     n$run$Ex = n$run$Ex + x
     n$run$Ex2 = n$run$Ex2 + x^2
+    n$run$year = current_year
     if (n$run$n %% 100 == 0) { # save after every 100
-      values <- c(as.numeric(n$run), current_year)
+      values <- n$run
       cat("Writing to simulation database:", values, "\n", file=stderr())
       write_row("simulation", sim_columns, values)
     }
