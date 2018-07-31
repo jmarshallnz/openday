@@ -21,14 +21,14 @@ read_rows <- function(table, columns) {
 }
 
 # create the database if possible
-create_database <- function(table, columns) {
+create_database <- function(table, columns, types = "INT") {
   success <- FALSE
 
   try({
     conn <- dbConnect(RMySQL::MySQL(), user=user, password=pass, host='localhost', dbname=db)
 
     # create table if not already there
-    fields <- paste(c("sample_id INT PRIMARY KEY AUTO_INCREMENT", sprintf("%s INT", columns)), collapse=",")
+    fields <- paste(c("sample_id INT PRIMARY KEY AUTO_INCREMENT", sprintf("%s %s", columns, types)), collapse=",")
 
     res <- dbSendQuery(conn, paste("CREATE TABLE IF NOT EXISTS", table, "(", fields, ");"))
     dbClearResult(res)

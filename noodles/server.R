@@ -25,7 +25,7 @@ if (!create_database("noodle", columns)) {
   cat("Unable to create database\n", file=stderr());
 }
 sim_columns <- c("n", "Ex", "Ex2", "year")
-if (!create_database("simulation", sim_columns)) {
+if (!create_database("simulation", sim_columns, types=c("INT", "DOUBLE", "DOUBLE", "INT"))) {
   cat("Unable to create database\n", file=stderr());
 }
 sim_start <- na.omit(read_rows("simulation", sim_columns))
@@ -100,8 +100,10 @@ shinyServer(function(input, output, session) {
     n$run$year = current_year
     if (n$run$n %% 100 == 0) { # save after every 100
       values <- n$run
-      cat("Writing to simulation database:", values, "\n", file=stderr())
-      write_row("simulation", sim_columns, values)
+      cat("Writing to simulation database:", as.numeric(values), "\n", file=stderr())
+      if (!write_row("simulation", sim_columns, n$run)) {
+        cat("Unable to write simulation to database\n", file=stderr())
+      }
     }
     # add to our noodle list to update the plot
     n$noodles[[length(n$noodles)+1]] <- noodle
