@@ -20,8 +20,8 @@ clamp <- function(x, xmin=0, xmax=20) {
   min(max(x, xmin), xmax)
 }
 
-# create database
-if (!create_database(columns)) {
+# create database for noodles
+if (!create_database("noodle", columns)) {
   cat("Unable to create database\n", file=stderr());
 }
 
@@ -38,7 +38,7 @@ calc_pi <- function(meanX, L, D) {
 
 shinyServer(function(input, output, session) {
 
-  v <- reactiveValues(samples = read_rows(columns))
+  v <- reactiveValues(samples = read_rows("noodle", columns))
   n <- reactiveValues(noodles = list(), points = NULL,
                       run=list(n=0, K=0, Ex=0, Ex2=0),
                       Gx=6, Gy=3)
@@ -60,7 +60,7 @@ shinyServer(function(input, output, session) {
     if (sum(!is.na(sample)) > 0) {
       # write the results to the database
       v$samples <- rbind(v$samples, c(sample, current_year))
-      if (!write_row(columns, c(sample, current_year))) {
+      if (!write_row("noodle", columns, c(sample, current_year))) {
         cat("Unable to write sample to database\n", file=stderr())
       }
     }

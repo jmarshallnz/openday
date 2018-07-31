@@ -3,10 +3,9 @@ library(RMySQL)
 user  <- 'openday'
 pass  <- 'openday'
 db    <- 'openday'
-table <- 'noodle'
 
 # fetch from the database if possible
-read_rows <- function(columns) {
+read_rows <- function(table, columns) {
   values <- NULL
 
   try({
@@ -22,13 +21,13 @@ read_rows <- function(columns) {
 }
 
 # create the database if possible
-create_database <- function(columns) {
+create_database <- function(table, columns) {
   success <- FALSE
 
   try({
     conn <- dbConnect(RMySQL::MySQL(), user=user, password=pass, host='localhost', dbname=db)
-    
-    # create score table if not already there
+
+    # create table if not already there
     fields <- paste(c("sample_id INT PRIMARY KEY AUTO_INCREMENT", sprintf("%s INT", columns)), collapse=",")
 
     res <- dbSendQuery(conn, paste("CREATE TABLE IF NOT EXISTS", table, "(", fields, ");"))
@@ -43,7 +42,7 @@ create_database <- function(columns) {
 }
 
 # write row to the database if possible
-write_row <- function(columns, values) {
+write_row <- function(table, columns, values) {
   success <- FALSE
 
   wch <- which(!is.na(values))
