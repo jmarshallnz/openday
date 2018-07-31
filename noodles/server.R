@@ -33,6 +33,7 @@ if (!is.null(sim_start) && nrow(sim_start) > 0) {
   sim_start <- sim_start[nrow(sim_start),]
   cat("read simulation info from database\n", file=stderr())
 } else {
+  cat("didn't read simulation info from database - creating new\n", file=stderr())
   sim_start <- matrix(0, 1, length(sim_columns))
   colnames(sim_start) = sim_columns;
   sim_start <- as.data.frame(sim_start)
