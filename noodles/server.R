@@ -6,8 +6,8 @@ source("sample_db.R")
 source("bezier_stuff.R")
 
 # size of noodles
-L <- 200
-D <- 70
+L <- 210
+D <- 276.5/4
 
 # storage
 vars    <- paste0("count", 1:5)
