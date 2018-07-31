@@ -99,7 +99,7 @@ shinyServer(function(input, output, session) {
     n$run$Ex2 = n$run$Ex2 + x^2
     if (n$run$n %% 100 == 0) { # save after every 100
       values <- c(as.numeric(n$run), current_year)
-      cat("Writing to simulation database:", values, "\n")
+      cat("Writing to simulation database:", values, "\n", file=stderr())
       write_row("simulation", sim_columns, values)
     }
     # add to our noodle list to update the plot
