@@ -24,6 +24,19 @@ clamp <- function(x, xmin=0, xmax=20) {
 if (!create_database("noodle", columns)) {
   cat("Unable to create database\n", file=stderr());
 }
+sim_columns <- c("n", "Ex", "Ex2", "year")
+if (!create_database("simulation", sim_columns)) {
+  cat("Unable to create database\n", file=stderr());
+}
+sim_start <- na.omit(read_rows("simulation", sim_columns))
+if (!is.null(sim_start) && nrow(sim_start) > 0) {
+  sim_start <- sim_start[nrow(sim_start),]
+} else {
+  sim_start <- matrix(0, 1, length(sim_columns))
+  colnames(sim_start) = sim_columns;
+  sim_start <- as.data.frame(sim_start)
+  cat("sim_start\n", file=stderr())
+}
 
 # create a bunch of random noodles
 B <- replicate(100, gen_bezier(L=L/D), simplify = FALSE)
@@ -40,7 +53,7 @@ shinyServer(function(input, output, session) {
 
   v <- reactiveValues(samples = read_rows("noodle", columns))
   n <- reactiveValues(noodles = list(), points = NULL,
-                      run=list(n=0, K=0, Ex=0, Ex2=0),
+                      run=sim_start,
                       Gx=6, Gy=3)
 
   # reactive that converts input into something we can plot/use
@@ -84,6 +97,8 @@ shinyServer(function(input, output, session) {
     n$run$n = n$run$n + 1
     n$run$Ex = n$run$Ex + x
     n$run$Ex2 = n$run$Ex2 + x^2
+    if (n$run$n %% 100 == 0) # save after every 100
+      write_row("simulation", sim_columns, n$run)
     # add to our noodle list to update the plot
     n$noodles[[length(n$noodles)+1]] <- noodle
     n$points <- points
