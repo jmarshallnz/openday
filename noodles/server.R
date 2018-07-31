@@ -98,7 +98,7 @@ shinyServer(function(input, output, session) {
     n$run$Ex = n$run$Ex + x
     n$run$Ex2 = n$run$Ex2 + x^2
     if (n$run$n %% 100 == 0) # save after every 100
-      write_row("simulation", sim_columns, c(n$run, current_year))
+      write_row("simulation", sim_columns, c(as.numeric(n$run), current_year))
     # add to our noodle list to update the plot
     n$noodles[[length(n$noodles)+1]] <- noodle
     n$points <- points
