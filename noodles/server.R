@@ -97,8 +97,11 @@ shinyServer(function(input, output, session) {
     n$run$n = n$run$n + 1
     n$run$Ex = n$run$Ex + x
     n$run$Ex2 = n$run$Ex2 + x^2
-    if (n$run$n %% 100 == 0) # save after every 100
-      write_row("simulation", sim_columns, c(as.numeric(n$run), current_year))
+    if (n$run$n %% 100 == 0) { # save after every 100
+      values <- c(as.numeric(n$run), current_year)
+      cat("Writing to simulation database:", values, "\n")
+      write_row("simulation", sim_columns, values)
+    }
     # add to our noodle list to update the plot
     n$noodles[[length(n$noodles)+1]] <- noodle
     n$points <- points
