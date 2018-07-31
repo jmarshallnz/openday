@@ -1,0 +1,26 @@
+---
+title: "Buffon's Noodle instructions"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+The idea is to get students to throw some (rubber) noodles onto the wooden floor, and for each
+throw to count how many times the noodle crosses the cracks between the floor boards.
+
+On average, this should be $\frac{2}{\pi}\frac{L}{D}$ where $L$ is the length of the noodle and $D$ is the width of the floor boards. See the poster writeup for the reasoning behind this. By rearranging, we estimate $\pi$ (badly...)
+
+#### Instructions
+
+1. Get each student to throw more than one, but no more than 5 noodles onto the floor.
+2. Count the number of crossings per one, and enter them into the shiny app, pressing submit once done. Just enter however many throws they had - **leave entries blank if they had fewer than 5 throws.**
+
+    http://shiny.massey.ac.nz/jcmarsha/openday/noodles
+
+3. On the top left you have a histogram of the student's crosses. The red line is the mean, and dotted line the expectation. Their estimate of $\pi$ is in blue.
+
+4. On the bottom left you have a histogram of all noodle throws for the day.
+
+5. On the right there's a simulation. This is run using the slider down the bottom - it should just be left to run all day, but if for whatever reason you need to reload the shiny app, you'll need to restart the simulation by clicking the 'play' button in the bottom right. There's a 95% confidence interval for $\pi$ below the estimate.
+
+6. Contact Jonathan (022 0972 910) if something breaks and you can't get it working again.
