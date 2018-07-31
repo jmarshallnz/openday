@@ -85,30 +85,32 @@ shinyServer(function(input, output, session) {
   })
   
   observeEvent(input$slider, {
-    # remove a noodle
-    if (length(n$noodles) > num_noodles) {
-      n$noodles <- n$noodles[-1]
-    }
-    # generate a new noodle
-    noodle <- rand_bezier(B, n$Gx, n$Gy)
-    # count how many times it crosses
-    points <- intersect_bezier(noodle)
-    x <- nrow(points)
-    # update our values
-    n$run$n = n$run$n + 1
-    n$run$Ex = n$run$Ex + x
-    n$run$Ex2 = n$run$Ex2 + x^2
-    n$run$year = current_year
-    if (n$run$n %% 100 == 0) { # save after every 100
-      values <- n$run
-      cat("Writing to simulation database:", as.numeric(values), "\n", file=stderr())
-      if (!write_row("simulation", sim_columns, n$run)) {
-        cat("Unable to write simulation to database\n", file=stderr())
+    for (i in 1:2) {
+      # remove a noodle
+      if (length(n$noodles) > num_noodles) {
+        n$noodles <- n$noodles[-1]
       }
+      # generate a new noodle
+      noodle <- rand_bezier(B, n$Gx, n$Gy)
+      # count how many times it crosses
+      points <- intersect_bezier(noodle)
+      x <- nrow(points)
+      # update our values
+      n$run$n = n$run$n + 1
+      n$run$Ex = n$run$Ex + x
+      n$run$Ex2 = n$run$Ex2 + x^2
+      n$run$year = current_year
+      if (n$run$n %% 100 == 0) { # save after every 100
+        values <- n$run
+        cat("Writing to simulation database:", as.numeric(values), "\n", file=stderr())
+        if (!write_row("simulation", sim_columns, n$run)) {
+          cat("Unable to write simulation to database\n", file=stderr())
+        }
+      }
+      # add to our noodle list to update the plot
+      n$noodles[[length(n$noodles)+1]] <- noodle
+      n$points <- points
     }
-    # add to our noodle list to update the plot
-    n$noodles[[length(n$noodles)+1]] <- noodle
-    n$points <- points
   })
 
   # plot on the left shows actual data
