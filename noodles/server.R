@@ -31,11 +31,11 @@ if (!create_database("simulation", sim_columns)) {
 sim_start <- na.omit(read_rows("simulation", sim_columns))
 if (!is.null(sim_start) && nrow(sim_start) > 0) {
   sim_start <- sim_start[nrow(sim_start),]
+  cat("read simulation info from database\n", file=stderr())
 } else {
   sim_start <- matrix(0, 1, length(sim_columns))
   colnames(sim_start) = sim_columns;
   sim_start <- as.data.frame(sim_start)
-  cat("sim_start\n", file=stderr())
 }
 
 # create a bunch of random noodles
@@ -98,7 +98,7 @@ shinyServer(function(input, output, session) {
     n$run$Ex = n$run$Ex + x
     n$run$Ex2 = n$run$Ex2 + x^2
     if (n$run$n %% 100 == 0) # save after every 100
-      write_row("simulation", sim_columns, n$run)
+      write_row("simulation", sim_columns, c(n$run, current_year))
     # add to our noodle list to update the plot
     n$noodles[[length(n$noodles)+1]] <- noodle
     n$points <- points
