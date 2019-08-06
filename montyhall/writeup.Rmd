@@ -1,0 +1,27 @@
+---
+title: "Changing Minds with Statistics"
+output:
+  pdf_document: default
+---
+
+\pagenumbering{gobble}
+
+A famous problem in statistics is the Monty Hall problem.
+
+In it, we have a gameshow, where there are 3 doors. Behind one
+of the doors is a prize.
+
+A contestant is asked to choose a door.
+
+The host then opens one of the other two doors, revealing that
+the prize isn't behind it.
+
+The host then asks whether the contestant wishes to stick with the door they initially picked, or switch to the other remaining door.
+
+What would you do?
+
+It turns out that your best option is to switch to the other door - you double your chances of winning by doing so!
+
+One way to see why this is true is to note that if you don't change your mind, there's a 1 in 3 chance of winning as there are 3 doors.
+
+If you do change your mind, then the only way you lose is if the prize is behind the door you first picked (1 in 3). Thus, you must win 2 out of 3 times.
