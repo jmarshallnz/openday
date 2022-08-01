@@ -27,36 +27,24 @@ knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_chunk$set(fig.dim=c(4.8, 4.5), fig.retina=2, out.width="100%")
 ```
 
----
-
 # Monty Hall: Changing minds with Statistics
 
-
-A famous problem in statistics is the Monty Hall problem.
-
-In it, we have a gameshow, where there are 3 doors. Behind one
-of the doors is a prize.
+There are 3 doors. Behind one of the doors is a prize.
 
 A contestant is asked to choose a door.
 
 The host then opens one of the other two doors, revealing that
 the prize isn't behind it.
 
-The host then asks whether the contestant wishes to stick with the door they initially picked, or switch to the other remaining door.
+The contestant can then choose to stick with the door they originally picked, or switch to the other remaining door.
 
-What would you do?
-
-It turns out that your best option is to switch to the other door - you double your chances of winning by doing so!
-
-One way to see why this is true is to note that if you don't change your mind, there's a 1 in 3 chance of winning as there are 3 doors.
-
-If you do change your mind, then the only way you lose is if the prize is behind the door you first picked (1 in 3). Thus, you must win 2 out of 3 times.
+**What do you do?**
 
 ---
 
 ## Greedy pig
 
-Greedy pig is a game where two players take turns rolling a single die.
+Greedy pig is a game where players take turns rolling a single die.
 
 - On your turn, you may roll the die as many times as you want, until you either choose to stop or roll a one.
 
@@ -66,4 +54,41 @@ Greedy pig is a game where two players take turns rolling a single die.
 - The winner is the first player to reach a total score of 100
 
 **Should you roll again? What strategy might you choose to decide?**
+
+---
+
+class: middle, inverse
+
+# Solutions
+
+---
+
+## Monty Hall: Why you should change your mind
+
+If you switch doors in the game you double your chances of winning! Why?
+
+If you don't change your mind, there's a 1 in 3 chance of winning as there are 3 doors, and so the chance the prize is behind the one you picked is 1 in 3.
+
+If you do change your mind, then the only way you lose is if the prize is behind the door you first picked (1 in 3). Thus, you must win 2 out of 3 times.
+
+---
+
+## Greedy Pig: Optimal score strategy
+
+Suppose your score is currently $s$. If you roll again your score increases to:
+
+next roll | probability | score
+----------|-------------|-------
+1         | 1/6         | 0
+2         | 1/6         | s+2
+3         | 1/6         | s+3
+4         | 1/6         | s+4
+5         | 1/6         | s+5
+6         | 1/6         | s+6
+
+Your expected score is $\frac{1}{6}(s+2 + s+3 + s+4 + s+5 + s+6) = \frac{1}{6}(5s+20)$.
+
+You should roll if
+$$\begin{align}\frac{1}{6}(5s+20) &> s\\ \Rightarrow 5s+20 &> 6s\\ \Rightarrow s &<20\end{align}$$
+
 
