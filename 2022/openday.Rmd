@@ -1,0 +1,69 @@
+---
+title: 'Mathematics and Statistics'
+subtitle: 'Openday 2022'
+output:
+  xaringan::moon_reader:
+    css: [default, default-fonts, "custom.css"]
+    nature:
+      highlightStyle: tomorrow
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: "16:9"
+      slideNumberFormat: |
+        <div class="progress-bar-container">
+          <div class="progress-bar" style="width: calc(%current% / %total% * 100%);">
+          </div>
+        </div>
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(palmerpenguins)
+penguins = na.omit(penguins)
+#data(package = 'palmerpenguins')
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(fig.dim=c(4.8, 4.5), fig.retina=2, out.width="100%")
+```
+
+---
+
+# Monty Hall: Changing minds with Statistics
+
+
+A famous problem in statistics is the Monty Hall problem.
+
+In it, we have a gameshow, where there are 3 doors. Behind one
+of the doors is a prize.
+
+A contestant is asked to choose a door.
+
+The host then opens one of the other two doors, revealing that
+the prize isn't behind it.
+
+The host then asks whether the contestant wishes to stick with the door they initially picked, or switch to the other remaining door.
+
+What would you do?
+
+It turns out that your best option is to switch to the other door - you double your chances of winning by doing so!
+
+One way to see why this is true is to note that if you don't change your mind, there's a 1 in 3 chance of winning as there are 3 doors.
+
+If you do change your mind, then the only way you lose is if the prize is behind the door you first picked (1 in 3). Thus, you must win 2 out of 3 times.
+
+---
+
+## Greedy pig
+
+Greedy pig is a game where two players take turns rolling a single die.
+
+- On your turn, you may roll the die as many times as you want, until you either choose to stop or roll a one.
+
+    - If you choose to stop, your score for this turn is the sum of the numbers you rolled.
+    - If you roll a one, your score for this turn is zero.
+
+- The winner is the first player to reach a total score of 100
+
+**Should you roll again? What strategy might you choose to decide?**
+
