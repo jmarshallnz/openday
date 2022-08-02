@@ -40,7 +40,8 @@ style_mono_accent(
   colors = c(
     blue = "#31c9e8",
     pink = "#ea86f7",
-    gold = "#fcc153"
+    gold = "#fcc153",
+    green = "#35fc8b"
   )
 )
 ```
@@ -76,9 +77,13 @@ draw_slogan("ARE YOU LYING?", "WE CAN TELL.")
 ```
 
 ```{r, message=FALSE, warning=FALSE, results='asis'}
-draw_slogan("ARE YOU GREEDY?", "SO ARE WE.", col='pink')
+draw_slogan("ARE YOU GREEDY?", "WE ARE TOO.", col='pink')
 ```
 
 ```{r, message=FALSE, warning=FALSE, results='asis'}
 draw_slogan("DO YOU FEEL LUCKY?", "CHANGE YOUR MIND.", col="gold")
+```
+
+```{r, message=FALSE, warning=FALSE, results='asis'}
+draw_slogan("MATHS AND STATS", "@MASSEY", col="green")
 ```
