@@ -76,7 +76,7 @@ draw_slogan("ARE YOU LYING?", "WE CAN TELL.")
 ```
 
 ```{r, message=FALSE, warning=FALSE, results='asis'}
-draw_slogan("ARE YOU GREEDY?", "WE CAN HELP.", col='pink')
+draw_slogan("ARE YOU GREEDY?", "SO ARE WE.", col='pink')
 ```
 
 ```{r, message=FALSE, warning=FALSE, results='asis'}
