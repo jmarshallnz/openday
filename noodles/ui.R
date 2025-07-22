@@ -22,7 +22,7 @@ inputs[[1]] <- h4("Sample input")
 inputs <- c(inputs, lapply(1:5, createInput, width="80px"))
 inputs[[length(inputs)+1]] <- actionButton("submit", label="Submit")
 inputs[[length(inputs)+1]] <- sliderInput("slider", label=NULL, value=0, min=0, max=100, step=1,
-                                          animate=animationOptions(interval=2000, loop=TRUE))
+                                          animate=animationOptions(interval=500, loop=TRUE))
 
 shinyUI(fluidPage(
   titlePanel("Throwing Noodles to estimate \U03C0"),

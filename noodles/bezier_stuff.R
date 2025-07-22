@@ -6,7 +6,7 @@ library(bezier)
 
 gen_bezier <- function(L) {
   while (TRUE) {
-    N <- 10
+    N <- 3
     # Hmm, maybe try brownian motion?
     u <- matrix(0, N+1, 2)
     u[1:N+1,] <- rnorm(2*N, mean=0, sd=L/3)
@@ -14,12 +14,17 @@ gen_bezier <- function(L) {
     u[,2] <- cumsum(u[,2])
 
     # Generate a random bezier
-    b <- bezier(t=seq(0,1,length=100), u)
-    # Truncate b
-    d <- cumsum(sqrt(diff(b[,1])^2 + diff(b[,2])^2))
-    n1 <- min(which(d >= L))
-    if (!is.infinite(n1))
-      break
+    b <- bezier(t=seq(0,5,length=100), u)
+    # check for high curvature (low segment length)
+    min_arc_len <- min((diff(b)[,1])^2 + (diff(b)[,2])^2)
+    if (min_arc_len > L/nrow(b) / 10) {
+      # Not too high curvature
+      # Truncate b
+      d <- cumsum(sqrt(diff(b[,1])^2 + diff(b[,2])^2))
+      n1 <- min(which(d >= L))
+      if (!is.infinite(n1))
+        break
+    }
   }
   # mayaswell move the last point as close as possible to what we want
   alpha <- approx(x=d[(n1-1):n1], y=0:1, xout=L)$y
