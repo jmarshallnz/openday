@@ -53,7 +53,7 @@ calc_pi <- function(meanX, L, D) {
 shinyServer(function(input, output, session) {
 
   v <- reactiveValues(samples = read_rows("noodle", columns))
-  n <- reactiveValues(noodles = list(), points = NULL,
+  n <- reactiveValues(noodles = list(), points = list(),
                       run=sim_start,
                       Gx=6, Gy=3)
 
@@ -89,6 +89,7 @@ shinyServer(function(input, output, session) {
       # remove a noodle
       if (length(n$noodles) > num_noodles) {
         n$noodles <- n$noodles[-1]
+        n$points <- n$points[-1]
       }
       # generate a new noodle
       noodle <- rand_bezier(B, n$Gx, n$Gy)
@@ -109,7 +110,7 @@ shinyServer(function(input, output, session) {
       }
       # add to our noodle list to update the plot
       n$noodles[[length(n$noodles)+1]] <- noodle
-      n$points <- points
+      n$points[[length(n$points)+1]] <- points
     }
   })
 
@@ -175,10 +176,12 @@ shinyServer(function(input, output, session) {
     abline(v=seq(0, n$Gx, by=1))
     if (length(n$noodles) > 1) {
       lapply(1:(length(n$noodles)-1), function(i) {
-        lines(n$noodles[[i]], col=rgb(0,0,0,alpha=0.5-0.5*(length(n$noodles)-i)/num_noodles), lwd=2)
-        })
+        col <- rgb(0,0,0,alpha=0.5-0.5*(length(n$noodles)-i)/num_noodles)
+        lines(n$noodles[[i]], col=col, lwd=2)
+        points(n$points[[i]], col=col, pch=19, cex=1)
+      })
       lines(n$noodles[[length(n$noodles)]], col='black', lwd=3)
-      points(n$points, col='red', pch=19, cex=2)
+      points(n$points[[length(n$noodles)]], col='red', pch=19, cex=2)
     }
     title("Simulated noodles")
     if (n$run$n > 1) {
